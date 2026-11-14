@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Billz</title>
+<meta name="description" content="The city runs on billz. Trade real stocks, perps and fresh pump.fun coins, and own the city one coin at a time, from your own wallet on Solana.">
+<meta property="og:title" content="Billz">
+<meta property="og:description" content="Stocks, perps, the pump.fun trenches and city coins in one terminal, from your own wallet on Solana.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://billz.vercel.app/assets/img/og.jpg">
+<meta name="twitter:image" content="https://billz.vercel.app/assets/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#b34783">
+<link rel="icon" href="/assets/img/billz.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/billz-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/img/billz-192.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-180.png">
+<link rel="preload" href="/assets/fonts/bowlby.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/unbounded.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/img/city-poster.jpg" as="image" media="(orientation:landscape)">
+<link rel="preload" href="/assets/img/city-poster-m.jpg" as="image" media="(orientation:portrait)">
+<script type="importmap">{"imports":{"three":"/assets/vendor/three/three.module.min.js","three/addons/":"/assets/vendor/three/addons/"}}</script>
+<style>
+@font-face{font-family:Bowlby;src:url(/assets/fonts/bowlby.woff2) format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:Unbounded;src:url(/assets/fonts/unbounded.woff2) format('woff2');font-weight:200 900;font-display:swap}
+@font-face{font-family:Inter;src:url(/assets/fonts/inter.woff2) format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:JBM;src:url(/assets/fonts/jbm.woff2) format('woff2');font-weight:100 800;font-display:swap}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+:root{--ease:cubic-bezier(.2,.8,.2,1);--ink:#2a0f24;--ink2:#5e3a4e;--mute:#8e6f7c;--ind:#d92f6b;--ind2:#3a0c2e;--pur:#f0476c;--gold:#f2b134;--gold2:#e08a1e;--cream:#fffaf0;--paper:#f7f2e9;--paper2:#f0e8d9;--card:#fffdf8;--line:rgba(42,15,36,.12);--line2:rgba(42,15,36,.2);--up:#138a57;--dn:#d03a4f;--grad:linear-gradient(90deg,#d92f6b 0%,#f0476c 50%,#f0962a 100%);--mono:JBM,ui-monospace,SFMono-Regular,Menlo,monospace;--disp:Unbounded,Inter,system-ui,sans-serif;--pad:clamp(18px,5vw,72px)}
+html{-webkit-text-size-adjust:100%;overflow-x:hidden;scroll-behavior:smooth}
+body{font-family:Inter,system-ui,sans-serif;font-size:15.5px;line-height:1.6;color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased;overflow-x:clip;font-feature-settings:"cv11","ss01"}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img{display:block}
+::selection{background:rgba(240,71,108,.28)}
+/* Unbounded's ss01 turns digits into circled ones: the display face keeps its default glyphs */
+.wm,.feat{font-feature-settings:normal}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:60;opacity:.05;mix-blend-mode:multiply;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+
+/* ---------------- hero */
+.hero{position:relative;height:100vh;height:100svh;min-height:560px;overflow:hidden;background:#d0607a;color:var(--cream);isolation:isolate}
+.hero .poster{position:absolute;inset:0;background:url(/assets/img/city-poster.jpg) 50% 50%/cover no-repeat;z-index:-3}
+@media (orientation:portrait){.hero .poster{background-image:url(/assets/img/city-poster-m.jpg)}}
+#cityGL{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:-2;opacity:0;transition:opacity 1.4s var(--ease)}
+#cityGL.on{opacity:1}
+.hero .veil{position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(42,15,36,0) 34%,rgba(42,15,36,.26) 56%,rgba(42,15,36,.6) 100%)}
+.stack{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:clamp(70px,13vh,150px) 20px clamp(40px,8vh,90px);pointer-events:none}
+.stack>*{pointer-events:auto}
+.wm{font-family:Bowlby,var(--disp);font-weight:400;font-size:clamp(84px,15.5vw,250px);line-height:.9;letter-spacing:-.01em;color:var(--cream);text-shadow:.05em .05em 0 var(--ind2);white-space:nowrap;padding-right:.04em}
+.wm .l{display:inline-block;animation:drop .9s var(--ease) both;animation-delay:calc(.05s + var(--i) * .07s)}
+.wm{position:relative}
+/* the logo's sparkles, twinkling */
+.spk{position:absolute;width:.15em;height:.15em;background:var(--cream);clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);animation:pop .6s 1.1s var(--ease) both,twinkle 3s 1.7s ease-in-out infinite;pointer-events:none}
+.spk.s1{right:-.13em;top:-.08em}
+.spk.s2{right:-.3em;top:.2em;width:.07em;height:.07em;background:var(--gold);animation-delay:.55s,1.6s}
+.spk.s3{left:-.16em;bottom:.02em;width:.09em;height:.09em;animation-delay:.65s,2.3s}
+@keyframes twinkle{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(.5) rotate(45deg);opacity:.75}}
+@keyframes drop{0%{opacity:0;transform:translateY(-.5em) rotate(-6deg)}60%{opacity:1;transform:translateY(.04em) rotate(1deg)}100%{transform:none}}
+.p{max-width:520px;margin-top:12px;text-wrap:balance;font-size:clamp(14.5px,1.15vw,16.5px);line-height:1.6;color:#fff6e6;text-shadow:0 1px 14px rgba(42,15,36,.6),0 0 2px rgba(42,15,36,.4);animation:rise 1s 1.08s var(--ease) both}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}}
+.cta{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:clamp(20px,3.2vh,32px);animation:rise 1s 1.2s var(--ease) both}
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:12px;height:56px;padding:0 30px;border-radius:999px;font-weight:800;font-size:13px;letter-spacing:.2em;text-transform:uppercase;transition:transform .35s var(--ease),box-shadow .35s var(--ease),background .3s,letter-spacing .45s var(--ease)}
+.btn .a,.btn svg{transition:transform .35s var(--ease)}
+.btn:hover{letter-spacing:.24em}
+.btn:hover .a,.btn:hover svg{transform:translateX(4px)}
+.btn.pri{background:var(--cream);color:var(--ind2);box-shadow:0 5px 0 var(--ind2)}
+.btn.pri::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(240,71,108,.22) 50%,transparent 70%);transform:translateX(-120%);animation:shine 5.5s 3.4s ease-in-out infinite;pointer-events:none}
+@keyframes shine{0%{transform:translateX(-120%)}22%,100%{transform:translateX(120%)}}
+.btn.pri:hover{transform:translateY(-2px);box-shadow:0 7px 0 var(--ind2)}
+.btn.pri:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ind2)}
+.btn.sec{background:rgba(255,250,240,.16);color:var(--cream);border:1.5px solid rgba(255,250,240,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.btn.sec:hover{background:rgba(255,250,240,.3)}
+.links{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:14px}
+.links:empty{display:none}
+.ca{display:inline-flex;align-items:center;gap:10px;height:40px;padding:0 6px 0 14px;border-radius:999px;background:rgba(42,15,36,.42);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-family:var(--mono);font-size:12.5px}
+.ca span{font-weight:800;color:var(--cream)}
+.ca button{height:30px;padding:0 12px;border-radius:999px;background:var(--cream);color:var(--ind2);font-weight:800;font-size:11px;letter-spacing:.08em}
+.xl{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:rgba(42,15,36,.42);color:var(--cream)}
+
+@keyframes pop{from{opacity:0;transform:scale(.8)}}
+/* one screen: the city, the word, the line, the buttons. Nothing under it. */
+html,body{height:100%}
+body{background:#3a0c2e}
+@media (min-height:560px){html,body{overflow:hidden}}
+.feat{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.5em 1.1em;margin-top:clamp(16px,2.6vh,26px);font-family:var(--disp);font-weight:700;font-size:clamp(13px,1.3vw,18px);letter-spacing:.24em;text-transform:uppercase;color:var(--cream);text-shadow:.08em .08em 0 var(--ind2);font-feature-settings:normal;animation:rise .8s .3s var(--ease) both}
+.feat i{width:.62em;height:.62em;background:var(--gold);clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);filter:drop-shadow(.08em .08em 0 var(--ind2))}
+.feat .fg{display:inline-flex;align-items:center;gap:1.1em;white-space:nowrap}
+.p{animation-delay:.4s;animation-duration:.8s}
+.cta{animation-delay:.5s;animation-duration:.8s}
+.spk{animation:pop .5s .45s var(--ease) both,twinkle 3s 1s ease-in-out infinite}
+@media (max-width:520px){
+  .btn{height:50px;padding:0 20px;font-size:14px}
+  .feat{flex-direction:column;letter-spacing:.16em;gap:.7em}.feat .fg{gap:.8em}.feat .fm{display:none}
+  .stack{padding-top:clamp(60px,12vh,120px)}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<section class="hero" id="hero">
+  <div class="poster" aria-hidden="true"></div>
+  <canvas id="cityGL" aria-hidden="true"></canvas>
+  <div class="veil" aria-hidden="true"></div>
+  <div class="stack">
+    <h1 class="wm" aria-label="billz"><span class="l" style="--i:0" aria-hidden="true">b</span><span class="l" style="--i:1" aria-hidden="true">i</span><span class="l" style="--i:2" aria-hidden="true">l</span><span class="l" style="--i:3" aria-hidden="true">l</span><span class="l" style="--i:4" aria-hidden="true">z</span><i class="spk s1" aria-hidden="true"></i><i class="spk s2" aria-hidden="true"></i><i class="spk s3" aria-hidden="true"></i></h1>
+    <div class="feat"><span class="fg"><span>Trade stocks</span><i aria-hidden="true"></i><span>Long &amp; short</span></span><i class="fm" aria-hidden="true"></i><span class="fg"><span>Ape trenches</span><i aria-hidden="true"></i><span>Own the city</span></span></div>
+    <p class="p">One terminal for all of it, from your own wallet on Solana.</p>
+    <div class="cta">
+      <a class="btn pri" href="/app">Enter the terminal <span class="a">→</span></a>
+      <a class="btn sec" href="/app#trench">The trenches</a>
+    </div>
+    <div class="links" id="caSlot"></div>
+  </div>
+</section>
+
+<script src="/assets/js/config.js?v=20261114d"></script>
+<script>
+(function () {
+  const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
+  const CFG = window.BILLZ || window.MARKETS || {};
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const fine = matchMedia('(pointer: fine)').matches, still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // launch links: only once the coin is live
+  {
+    const xs = CFG.x ? `<a class="xl" href="${esc(CFG.x)}" target="_blank" rel="noopener" aria-label="Billz on X"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23 22h-6.8l-5.3-6.9L4.8 22H1.7l8.1-9.3L1 2h7l4.8 6.3L18.9 2zm-1.2 18h1.9L7.1 3.9H5.1L17.7 20z"/></svg></a>` : '';
+    const ca = CFG.ca ? `<div class="ca"><span>$BILLZ</span><code>${esc(CFG.ca.slice(0, 5))}…${esc(CFG.ca.slice(-5))}</code><button id="cp" type="button">COPY</button></div>` : '';
+    $('#caSlot').innerHTML = ca + xs;
+    const cp = $('#cp'); if (cp) cp.onclick = () => { navigator.clipboard && navigator.clipboard.writeText(CFG.ca); cp.textContent = 'COPIED'; setTimeout(() => { cp.textContent = 'COPY'; }, 1400); };
+  }
+
+  // the city in 3D: a sunset beach city, billz coming down (the poster shows until the first frame)
+  let city = null;
+  const SUNSET = { zen: [0.04, 0.01, 0.1], mid: [0.55, 0.08, 0.28], hor: [2.8, 1.0, 0.28], fog: [1.3, 0.42, 0.32], hemi: ['#ffc9a0', '#2a0a28', 0.5], sun: ['#ff9a50', 1.4], fill: ['#ff7fa8', 0.45], neon: ['#ff4f8b', '#19d3c5', '#ffcf3d', '#ff8a3d', '#fff3e0', '#ff5fa2', '#2ee6d6'], water: '#0c3a48', glint: '#ffb050' };
+  function glOk() { try { return !!document.createElement('canvas').getContext('webgl2'); } catch (e) { return false; } }
+  function boot() {
+    if (still || !glOk()) return;
+    import('/assets/js/city3d.js?v=20261114d').then(m => {
+      city = m.startCity($('#cityGL'), { layout: 'beach', pal: SUNSET, fog: 0.00011, exposure: 0.78, night: 0.85, sunElev: 2, bill: '/assets/img/bill-face.jpg', landmark: false, onFirst: () => $('#cityGL').classList.add('on') });
+    }).catch(e => console.warn('city', e));
+  }
+  if (document.readyState === 'complete') setTimeout(boot, 60); else addEventListener('load', () => setTimeout(boot, 60));
+  if (fine && !still) addEventListener('pointermove', e => { if (city && city.setPointer) city.setPointer(e.clientX / innerWidth * 2 - 1, e.clientY / innerHeight * 2 - 1); }, { passive: true });
+  if (fine && !still) $$('.btn').forEach(b => { b.addEventListener('pointermove', e => { const r = b.getBoundingClientRect(); b.style.translate = `${((e.clientX - r.left) / r.width - 0.5) * 10}px ${((e.clientY - r.top) / r.height - 0.5) * 8}px`; }); b.addEventListener('pointerleave', () => { b.style.translate = '0 0'; }); });
+})();
+</script>
+</body>
+</html>
